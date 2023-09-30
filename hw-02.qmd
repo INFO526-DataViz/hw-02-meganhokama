@@ -1,16 +1,79 @@
 ---
 title: "HW 02"
-author: "INSERT YOUR NAME HERE"
+author: "Megan Hokama"
 format: 
   html:
     embed-resources: true
 toc: true
 ---
+```{r}
+#| label: Set up environment
+# Load and install necessary libraries
+
+if(!require(pacman))
+  install.packages("pacman")
+
+pacman::p_load(tidyverse,
+               ggridges,
+               dsbox,
+               dplyr,
+               janitor)
+pacman::p_load_gh("rstudio-education/dsbox")
+library(RColorBrewer)
+
+# set theme for ggplot2
+ggplot2::theme_set(ggplot2::theme_minimal(base_size = 14))
+
+# set width of code output
+options(width = 65)
+
+# set figure parameters for knitr
+knitr::opts_chunk$set(
+  fig.width = 7, # 7" width
+  fig.asp = 0.618, # the golden ratio
+  fig.retina = 3, # dpi multiplier for displaying HTML output on retina
+  fig.align = "center", # center align figures
+  dpi = 300 # higher dpi, sharper image
+)
+
+
+```
+
 
 ## 1 - A new day, a new plot, a new geom
 
 ```{r}
-#| label: label-me-1
+#| label: Create ridgeline plot with Airbnb ratings and Edinburgh neighborhoods
+
+#load data and use glimpse to overview the data
+edibnb |>
+  glimpse()     
+
+# Remove rows with NA values
+edibnb <- na.omit(edibnb)
+
+#Calculate the median review and order
+median_scores <- edibnb %>%
+  group_by(neighbourhood) %>%
+  summarize(median_score = median(review_scores_rating)) %>%
+  arrange(desc(median_score))
+
+# Reorder the neighborhoods based on median scores
+edibnb$neighbourhood <- factor(edibnb$neighbourhood, levels = median_scores$neighbourhood)
+
+#create ridgeplot referencing https://wilkelab.org/ggridges/
+ggplot(edibnb, aes(x = review_scores_rating, y = neighbourhood, fill = neighbourhood)) +
+  geom_density_ridges() + 
+  scale_fill_brewer(palette = "Paired") + #colorblind-friendly palette with the most color options
+  labs(title = "Airbnb Review Scores in Edinburgh Neighborhoods",
+       subtitle = "Neighbourhoods Ordered by Median Review Scores",
+       x = "Review Score",
+       y = "Neighbourhood") +
+  theme_minimal() +
+  guides(fill = "none") #Remove the legend as it is redundant information
+
+#Joint Bandwidth = 1.22
+#Interpretation: In this ridgeplot, we are able to see the Airbnb review scores in Edinburgh Neighborhood. The vertical position of the ridges on the y-axis indicates the ordering of neighborhoods by their median review scores. Neighborhoods at the top have higher median review scores, while those at the bottom have lower median review scores.The width and shape of each ridge represent the density of review scores in that neighborhood. Wider ridges indicate higher density of review scores in a particular range, while narrower ridges indicate lower density.
 
 ```
 
