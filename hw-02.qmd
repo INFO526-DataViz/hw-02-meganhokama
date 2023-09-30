@@ -82,6 +82,66 @@ ggplot(edibnb, aes(x = review_scores_rating, y = neighbourhood, fill = neighbour
 ```{r}
 #| label: label-me-2
 
+#Load packages again
+pacman::p_load(tidyverse, 
+               openintro, 
+               ggplot2, 
+               here, 
+               devtools, 
+               dsbox, 
+               ggridges, 
+               dplyr, 
+               fs, 
+               janitor, 
+               tidyr)
+
+# get a list of files with "Foreign Connected PAC" in their names
+list_of_files <- dir_ls(path = "data", regexp = "Foreign Connected PAC")
+
+# read all files and row bind them
+# keeping track of the file name in a new column called year
+pac <- read_csv(list_of_files, id = "year", show_col_types = F)
+
+#clean data
+pac <- pac %>%
+  clean_names()
+
+pac|>
+  glimpse() #Making sure to look at the data variables for next portion
+
+#extracting year
+pac$year<-substr(pac$year,nchar(pac$year)-8+1,nchar(pac$year)-4)
+pac$year=as.integer(pac$year)
+
+#Then, pivot the data longer such that instead of dems and repubs columns you have a column called party with levels: Democrat and Republican and another column called amount that contains the amount of contribution.
+pac_long <- pac %>%
+  pivot_longer( #pivot columns into a longer format
+    cols = c(dems, repubs),
+    names_to = "party",  #Name the new column to "party"
+    values_to = "amount" #Name of the column with contribution amount
+  ) %>%
+  mutate(
+    party = ifelse(party == "dems", "Democrat", "Republican")  # Rename 'dems' to 'Democrat' and 'repubs' to 'Republican'
+  )
+
+# Display the first few rows of the pivoted data to check if columns were created
+head(pac_long)
+
+#splitting into country of origin and parent company
+pac_long<- pac_long|>
+  separate(country_of_origin_parent_company,into=c("country_of_origin","parent_company"),sep="/",convert=T)
+
+# Filter the data for PACs with country_of_origin as UK
+uk_contributions <- pac_long %>%
+  filter(country_of_origin == "UK")
+
+# Group by year, party, and sum the contributions/HAVING TROUBLE!
+summary_table <- uk_contributions %>%
+  group_by(party, year) %>% 
+  summarize(total_contribution = sum(uk_contributions$amount))
+
+
+
 ```
 
 ## 3 - Hop on
