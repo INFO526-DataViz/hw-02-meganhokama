@@ -72,11 +72,11 @@ ggplot(edibnb, aes(x = review_scores_rating, y = neighbourhood, fill = neighbour
   theme_minimal() +
   guides(fill = "none") #Remove the legend as it is redundant information
 
-#Joint Bandwidth = 1.22
-#Interpretation: In this ridgeplot, we are able to see the Airbnb review scores in Edinburgh Neighborhood. The vertical position of the ridges on the y-axis indicates the ordering of neighborhoods by their median review scores. Neighborhoods at the top have higher median review scores, while those at the bottom have lower median review scores.The width and shape of each ridge represent the density of review scores in that neighborhood. Wider ridges indicate higher density of review scores in a particular range, while narrower ridges indicate lower density.
+
 
 ```
-
+Joint Bandwidth = 1.22
+Interpretation: In this ridgeplot, we are able to see the Airbnb review scores in Edinburgh Neighborhood. The vertical position of the ridges on the y-axis indicates the ordering of neighborhoods by their median review scores. Neighborhoods at the top have higher median review scores, while those at the bottom have lower median review scores.The width and shape of each ridge represent the density of review scores in that neighborhood. Wider ridges indicate higher density of review scores in a particular range, while narrower ridges indicate lower density.
 ## 2 - Foreign Connected PACs
 
 ```{r}
@@ -184,9 +184,11 @@ rdu_flights_planes_new<- rdu_flights_planes |>
                         seats>50 & seats<=110~"Medium",
                         seats>110 & seats<=200~"Large",
                         seats>200~"Jumbo"))
+```
+Justification: The reasons for these numbers is due to the histogram and how the data points were distributed. Based on the histogram, there seemed to be four separate segments within the histogram so I used that to inform my decision. Additionally, I used this article to inform how many seats would be in certain planes. https://aerocorner.com/blog/types-of-airplanes/
 
-#Justification: 
-         
+```{r}
+#|label: Recreating plot in HW assignment
 # Glimpse of the 'size' variable
 rdu_flights_planes_new |>
   glimpse()
@@ -246,10 +248,9 @@ ggplot(rdu_flights_planes_new, aes(x = manufacturer, y = arr_delay)) +
     legend.title = element_blank()
   )
 
-#Interpretation: Overall, this scatterplot provides a visual summary of departure delay patterns for different plane sizes and allows you to compare how different manufacturers perform in terms of on-time departures or delays. It can be used to identify trends and patterns that may be of interest to aviation professionals, airlines, or researchers studying flight operations.The plot is divided into facets, each representing a specific plane size category (e.g., Small, Medium, Large, Jumbo).This separation allows us to analyze the data for different plane sizes independently.
 
 ```
-
+Overall, this scatterplot provides a visual summary of departure delay patterns for different plane sizes and allows you to compare how different manufacturers perform in terms of on-time departures or delays. It can be used to identify trends and patterns that may be of interest to aviation professionals, airlines, or researchers studying flight operations.The plot is divided into facets, each representing a specific plane size category (e.g., Small, Medium, Large, Jumbo).This separation allows us to analyze the data for different plane sizes independently.
 
 ## 4 - Expect More. Plot More.
 ```{r}
@@ -268,7 +269,7 @@ circle <- tibble(
   y = 3 * cos(degree) - 2
 )
 
-# Create the plot
+# Create the plot using geom_path and geom_line
 ggplot(circle, aes(x, y)) +
   geom_path(
     color = "#E82118",
