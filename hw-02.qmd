@@ -64,13 +64,14 @@ edibnb$neighbourhood <- factor(edibnb$neighbourhood, levels = median_scores$neig
 #create ridgeplot referencing https://wilkelab.org/ggridges/
 ggplot(edibnb, aes(x = review_scores_rating, y = neighbourhood, fill = neighbourhood)) +
   geom_density_ridges() + 
-  scale_fill_brewer(palette = "Paired") + #colorblind-friendly palette with the most color options
+  scale_fill_brewer(palette = "Paired") +
   labs(title = "Airbnb Review Scores in Edinburgh Neighborhoods",
        subtitle = "Neighbourhoods Ordered by Median Review Scores",
        x = "Review Score",
        y = "Neighbourhood") +
   theme_minimal() +
-  guides(fill = "none") #Remove the legend as it is redundant information
+  guides(fill = "none") +
+  coord_cartesian(xlim = c(70, 100)) # Set x-axis limits from 70 to 100 so that the ridge plots can be zoomed in more. 
 
 
 
@@ -80,7 +81,7 @@ Interpretation: In this ridgeplot, we are able to see the Airbnb review scores i
 ## 2 - Foreign Connected PACs
 
 ```{r}
-#| label: label-me-2
+#| label: UK contributions and political parties
 
 #Load packages again
 pacman::p_load(tidyverse, 
@@ -140,14 +141,58 @@ summary_table <- uk_contributions %>%
   group_by(party, year) %>% 
   summarize(total_contribution = sum(uk_contributions$amount))
 
-summary_table_long <- summary_table %>%
-              pivot_longer(cols = c(Democrat, Republican), 
-               names_to = "Party", 
-               values_to = "Total_Contributions")
+```
 
-print(summary_table)
+``` {r Plotting of UK connected PACs}
+ggplot(summary_table,aes(x = year, 
+                         y = amount, 
+                         group = party,
+                         color = party)) +
+  geom_line(linewidth = 0.95) +
+  scale_color_manual(values = c(Democrat = "blue", Republican = "red")) + # Giving colors manually
+  labs(x = "Year",
+       y = "Total amount",
+       title = "Contributions to US political parties from UK-connected PACs",
+       caption = "Source: OpenSecrets.org",
+       color = "Party") +
+  theme_minimal() +
+  theme(
+    legend.position = c(0.9,0.17), # Changing legend position to replicate the required plot
+    axis.title = element_text(hjust = 0,vjust=0)
+  ) +
+    scale_y_continuous(labels = dollar_format(scale = 1e-06, suffix = "M"))
+```
+```{r}
+#|label: Use France to create a new graph, still having difficulty so I'll be sure to go to office hours
+# Filter the data for PACs with country_of_origin as UK
+france_contributions <- pac_long %>%
+  filter(country_of_origin == "France")
 
+# Group by year, party, and sum the contributions
+summary_table_france <- france_contributions %>%
+  group_by(party, year) %>% 
+  summarize(total_contribution_france = sum(france_contributions$amount))
+```
 
+``` {r Plot the data}
+
+ggplot(summary_table_france,aes(x = year, 
+                         y = total_contribution_france, 
+                         group = party,
+                         color = party)) +
+  geom_line(linewidth = 0.95) +
+  scale_color_manual(values = c(Democrat = "blue", Republican = "red")) + # Giving colors manually
+  labs(x = "Year",
+       y = "Total amount",
+       title = "Contributions to US political parties from France-connected PACs",
+       caption = "Source: OpenSecrets.org",
+       color = "Party") +
+  theme_minimal() +
+  theme(
+    legend.position = c(0.9,0.17), # Changing legend position to replicate the required plot
+    axis.title = element_text(hjust = 0,vjust=0)
+  ) +
+    scale_y_continuous(labels = dollar_format(scale = 1e-06, suffix = "M"))
 ```
 
 ## 3 - Hop on
@@ -306,9 +351,8 @@ ggplot(circle, aes(x, y)) +
     legend.position = "none"
   )
 
-
 ```
-
+Approach: I used the ggplot2 library in R to create a target logo. First, I generated a circular shape by calculating 'x' and 'y' coordinates based on degrees. My first step was to generate a sequence of degrees ranging from 0 to 360. This sequence served as the foundation for defining the circular shape of the logo. Then, I created a tibble named 'circle,' which represented the outer circle of the target logo. In this tibble, the 'x' and 'y' columns were calculated based on the sine and cosine of the degree values, respectively. These calculations resulted in the circular shape.Then, I added red outer and inner circles using 'geom_path()' and 'geom_line()', respectively. 'geom_path()' created the outer red circle. 'Geom_line()' was responsible for crafting the inner red circle. Adjusted the measurements so it was centered. 
 ## 5 - Mirror, mirror on the wall, who’s the ugliest of them all?
 ```{r}
 #|label: Ugly Penguin Plot
