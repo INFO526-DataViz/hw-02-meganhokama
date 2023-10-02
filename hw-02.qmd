@@ -277,7 +277,7 @@ ggplot(circle, aes(x, y)) +
     linejoin = "round"
   ) +
   geom_line(
-    aes(x / 3, (y / 3) - 1.5),
+    aes(x / 3, (y / 3) - 1.25),
     color = "#E82118",
     linewidth = 2,
     lineend = "round",
