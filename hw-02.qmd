@@ -140,14 +140,209 @@ summary_table <- uk_contributions %>%
   group_by(party, year) %>% 
   summarize(total_contribution = sum(uk_contributions$amount))
 
+summary_table_long <- summary_table %>%
+              pivot_longer(cols = c(Democrat, Republican), 
+               names_to = "Party", 
+               values_to = "Total_Contributions")
+
+print(summary_table)
 
 
 ```
 
 ## 3 - Hop on
 
+```{r}
+#| label: Flight Data
+
+# Load necessary libraries
+library(dplyr)
+
+# Load the datasets
+rdu_flights <- read.csv("data/rdu-flights-2020.csv")
+rdu_planes <- read.csv("data/rdu-planes-2020.csv")
+
+# Perform an inner join using 'tailnum' as the key
+rdu_flights_planes <- inner_join(rdu_flights, rdu_planes, by = "tailnum")
+
+# Report the number of rows and columns in the resulting dataset
+dim(rdu_flights_planes)
+
+rdu_flights_planes |>
+  glimpse()
+
+# Results indicate that there are 32533 rows and 27 columns
+# Define cutoffs for categorizing plane sizes based on seat capacity
+summary(rdu_flights_planes$seats)
+#plotting a histogram
+ggplot(rdu_flights_planes,aes(x=seats))+
+  geom_histogram()
+
+# Create the 'size' variable based on seat capacity
+rdu_flights_planes_new<- rdu_flights_planes |>
+  mutate(size=case_when(seats<=50~"Small",
+                        seats>50 & seats<=110~"Medium",
+                        seats>110 & seats<=200~"Large",
+                        seats>200~"Jumbo"))
+
+#Justification: 
+         
+# Glimpse of the 'size' variable
+rdu_flights_planes_new |>
+  glimpse()
+
+#Recreate plot
+# Load necessary libraries
+library(ggplot2)
+library(emo)
+
+#install packages
+install.packages("ragg")
+dev = "ragg_png"
+
+# Create the plot with emojis
+rdu_flights_planes_new|>
+  group_by(size)|>
+  count()|>
+
+ggplot(aes(x=size,y=n))+
+  geom_segment(aes(xend=size,yend=0),color="lightblue",linewidth=1)+
+  geom_text(aes(label ="✈️"), size = c(16,12,8,4), show.legend = FALSE)+    #flight emoji label found here:     https://symbl.cc/en/2708/
+  labs(x="Plane size",
+       y="Number of flights",
+       title="Number of flights out of RDU in 2020",
+       subtitle="By size of plane",
+       caption="Source: FAA Aircraft Registry and \nBureau of Transportation Statistics")+
+  coord_flip()+
+  scale_x_discrete(limits=rev)
+
+#
+ggplot(aes(x=size,y=distance))+
+  geom_segment(aes(xend=size,yend=0),color="blue",linewidth=1)+
+  geom_text(aes(label ="✈️"), size = c(16,12,8,4), show.legend = FALSE)+    #flight emoji label found here:     https://symbl.cc/en/2708/
+  labs(x="Plane size",
+       y="Distance",
+       title="Number of flights out of RDU in 2020",
+       subtitle="By size of plane",
+       caption="Source: FAA Aircraft Registry and \nBureau of Transportation Statistics")+
+  coord_flip()+
+  scale_x_discrete(limits=rev)
+
+#Scatterplot to compare flight delays by manufacturer and plane size
+ggplot(rdu_flights_planes_new, aes(x = manufacturer, y = arr_delay)) +
+  geom_point(aes(color = manufacturer), alpha = 0.7) +
+  facet_wrap(~size) +
+  labs(
+    x = "Manufacturer",
+    y = "Departure Delay (minutes)",
+    title = "Flight Delays by Manufacturer and Plane Size",
+    subtitle = "Color represents manufacturer",
+    caption = "Source: FAA Aircraft Registry and \nBureau of Transportation Statistic"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "right",
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.title = element_blank()
+  )
+
+#Interpretation: Overall, this scatterplot provides a visual summary of departure delay patterns for different plane sizes and allows you to compare how different manufacturers perform in terms of on-time departures or delays. It can be used to identify trends and patterns that may be of interest to aviation professionals, airlines, or researchers studying flight operations.The plot is divided into facets, each representing a specific plane size category (e.g., Small, Medium, Large, Jumbo).This separation allows us to analyze the data for different plane sizes independently.
+
+```
+
 
 ## 4 - Expect More. Plot More.
+```{r}
+#| label: Recreating the target logo
 
+# Create a dataset with coordinates and sizes for the circles
+library(ggplot2)
+library(tibble)
+
+# Create a sequence of degrees
+degree <- seq(0, 360)
+
+# Create a tibble of a circle of radius 3
+circle <- tibble(
+  x = 3 * sin(degree),
+  y = 3 * cos(degree) - 2
+)
+
+# Create the plot
+ggplot(circle, aes(x, y)) +
+  geom_path(
+    color = "#E82118",
+    size = 8,
+    lineend = "round",
+    linejoin = "round"
+  ) +
+  geom_line(
+    aes(x / 3, (y / 3) - 1.5),
+    color = "#E82118",
+    linewidth = 2,
+    lineend = "round",
+    linejoin = "round"
+  ) +
+  annotate(
+    geom = "text",
+    x = 0.5,
+    y = -7,
+    label = expression(bold("TARGET")["\u00AE"]),
+    color = "#E82118",
+    size = 8
+  ) +
+  theme_void() +
+  coord_fixed() +
+  xlim(-10, 10) +
+  ylim(-8, 3) +
+  theme(
+    plot.background = element_rect(fill = "white"),
+    panel.background = element_rect(fill = "white"),
+    axis.line = element_blank(),
+    axis.title = element_blank(),
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    legend.position = "none"
+  )
+
+
+```
 
 ## 5 - Mirror, mirror on the wall, who’s the ugliest of them all?
+```{r}
+#|label: Ugly Penguin Plot
+
+# Load necessary libraries
+library(ggplot2)
+library(palmerpenguins)
+
+# Create a plot using the default theme and color scales
+basic_plot <- ggplot(penguins, aes(x = species, y = bill_length_mm, fill = sex)) +
+  geom_boxplot() +
+  labs(
+    title = "Bill Length by Species and Sex",
+    x = "Species",
+    y = "Bill Length (mm)"
+  )
+
+# Display the basic plot
+print(basic_plot)
+
+# Create an intentionally ugly plot
+ugly_plot <- basic_plot +
+  theme(
+    # Change background color to neon yellow
+    plot.background = element_rect(fill = "yellow"),
+    
+    # Change plot title font size and color
+    plot.title = element_text(size = 30, color = "purple"),
+    
+    # Change axis labels to Comic Sans font
+    axis.text = element_text(size = 15, family = "Comic Sans MS"),
+  )
+
+# Print ugly plot
+print(ugly_plot)
+
+
+```
