@@ -47,7 +47,8 @@ Dear [STUDENT GITHUB NAME] -- Below is the feedback for your assignment. Please 
   
 ### Exercise 4: `[_ / 10 points]`
 
-- Plot (doesn't need to be with a `tibble()` or `tribble()`: `[_ / 10 points]`
+- Plot (doesn't need to be with a `tibble()` or `tribble()`: `[_ / 5 points]`
+- Approach: `[_ / 5 points]`
 - Feedback: [Insert feedback here.]
 
 ### Exercise 5: `[_ / 20 points]`
