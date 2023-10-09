@@ -139,7 +139,7 @@ uk_contributions <- pac_long %>%
 # Group by year, party, and sum the contributions/HAVING TROUBLE!
 summary_table <- uk_contributions %>%
   group_by(party, year) %>% 
-  summarize(total_contribution = sum(uk_contributions$amount))
+  summarize(total_contribution = count(uk_contributions$amount))
 
 ```
 
@@ -171,7 +171,7 @@ france_contributions <- pac_long %>%
 # Group by year, party, and sum the contributions
 summary_table_france <- france_contributions %>%
   group_by(party, year) %>% 
-  summarize(total_contribution_france = sum(france_contributions$amount))
+  summarize(total_contribution_france = count(france_contributions$amount))
 ```
 
 ``` {r Plot the data}
