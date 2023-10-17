@@ -287,19 +287,10 @@ ggplot(aes(x=size,y=n))+
   coord_flip()+
   scale_x_discrete(limits=rev)
 
-#Plot 2
-ggplot(aes(x=size,y=distance))+
-  geom_segment(aes(xend=size,yend=0),color="blue",linewidth=1)+
-  geom_text(aes(label ="✈️"), size = c(16,12,8,4), show.legend = FALSE)+    #flight emoji label found here:     https://symbl.cc/en/2708/
-  labs(x="Plane size",
-       y="Distance",
-       title="Number of flights out of RDU in 2020",
-       subtitle="By size of plane",
-       caption="Source: FAA Aircraft Registry and \nBureau of Transportation Statistics")+
-  coord_flip()+
-  scale_x_discrete(limits=rev)
+```
 
-#Scatterplot to compare flight delays by manufacturer and plane size
+```{r}
+#|label:Scatterplot to compare flight delays by manufacturer and plane size
 ggplot(rdu_flights_planes_new, aes(x = manufacturer, y = arr_delay)) +
   geom_point(aes(color = manufacturer), alpha = 0.7) +
   facet_wrap(~size) +
@@ -316,7 +307,6 @@ ggplot(rdu_flights_planes_new, aes(x = manufacturer, y = arr_delay)) +
     axis.text.x = element_text(angle = 45, hjust = 1),
     legend.title = element_blank()
   )
-
 
 ```
 Overall, this scatterplot provides a visual summary of departure delay patterns for different plane sizes and allows you to compare how different manufacturers perform in terms of on-time departures or delays. It can be used to identify trends and patterns that may be of interest to aviation professionals, airlines, or researchers studying flight operations.The plot is divided into facets, each representing a specific plane size category (e.g., Small, Medium, Large, Jumbo).This separation allows us to analyze the data for different plane sizes independently.
