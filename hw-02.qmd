@@ -290,7 +290,7 @@ ggplot(aes(x=size,y=n))+
 ```
 
 ```{r}
-#|label:Scatterplot to compare flight delays by manufacturer and plane size
+#|label: Scatterplot to compare flight delays by manufacturer and plane size
 ggplot(rdu_flights_planes_new, aes(x = manufacturer, y = arr_delay)) +
   geom_point(aes(color = manufacturer), alpha = 0.7) +
   facet_wrap(~size) +
