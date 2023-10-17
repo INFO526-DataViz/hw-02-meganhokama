@@ -110,57 +110,71 @@ pac <- pac %>%
 pac|>
   glimpse() #Making sure to look at the data variables for next portion
 
+# Dropping the column "total"
+pac <- within(pac, rm(total))
+
 #extracting year
 pac$year<-substr(pac$year,nchar(pac$year)-8+1,nchar(pac$year)-4)
 pac$year=as.integer(pac$year)
 
+# Removing the $ symbol and converting dems and repubs to numeric.
+pac <- pac %>%
+  mutate(dems = as.numeric(gsub("\\$", "", dems))) %>%
+  mutate(repubs = as.numeric(gsub("\\$", "", repubs)))
+
 #Then, pivot the data longer such that instead of dems and repubs columns you have a column called party with levels: Democrat and Republican and another column called amount that contains the amount of contribution.
+
 pac_long <- pac %>%
   pivot_longer( #pivot columns into a longer format
     cols = c(dems, repubs),
     names_to = "party",  #Name the new column to "party"
     values_to = "amount" #Name of the column with contribution amount
-  ) %>%
-  mutate(
-    party = ifelse(party == "dems", "Democrat", "Republican")  # Rename 'dems' to 'Democrat' and 'repubs' to 'Republican'
-  )
+  ) 
 
 # Display the first few rows of the pivoted data to check if columns were created
 head(pac_long)
 
 #splitting into country of origin and parent company
 pac_long<- pac_long|>
-  separate(country_of_origin_parent_company,into=c("country_of_origin","parent_company"),sep="/",convert=T)
+  separate(
+    col = "country_of_origin_parent_company",
+    into=c("country_of_origin","parent_company"),
+sep="/",convert=T)
 
 # Filter the data for PACs with country_of_origin as UK
 uk_contributions <- pac_long %>%
   filter(country_of_origin == "UK")
 
 # Group by year, party, and sum the contributions/HAVING TROUBLE!
-summary_table <- uk_contributions %>%
-  group_by(party, year) %>% 
-  summarize(total_contribution = count(uk_contributions$amount))
+summary_table_uk <- uk_contributions %>%
+  group_by(year, party) %>% 
+  summarise(total_amount = sum(amount), .groups = 'drop')
 
 ```
 
 ``` {r Plotting of UK connected PACs}
-ggplot(summary_table,aes(x = year, 
-                         y = amount, 
-                         group = party,
-                         color = party)) +
-  geom_line(linewidth = 0.95) +
-  scale_color_manual(values = c(Democrat = "blue", Republican = "red")) + # Giving colors manually
-  labs(x = "Year",
-       y = "Total amount",
-       title = "Contributions to US political parties from UK-connected PACs",
-       caption = "Source: OpenSecrets.org",
-       color = "Party") +
+ggplot(summary_table_uk, aes(x = year, y = total_amount)) +
+  geom_line(aes(color = party), linewidth = 1.2) +
   theme_minimal() +
-  theme(
-    legend.position = c(0.9,0.17), # Changing legend position to replicate the required plot
-    axis.title = element_text(hjust = 0,vjust=0)
+  labs(
+    x = "Year", y = "Total amount",  linetype = NULL,
+    color = "Party",
+    title = "Contibutions to US political parties from UK-connected PACs",
+    caption = "Source: OpenSecrets.org"
   ) +
-    scale_y_continuous(labels = dollar_format(scale = 1e-06, suffix = "M"))
+  scale_color_manual(
+    values = c("blue", "red"),
+    labels = c("Democrat", "Republican")
+  ) +
+  coord_cartesian(clip = "off") +
+  theme(
+    legend.position = c(0.9, 0.15),
+    axis.title.x = element_text(hjust = 0),
+    axis.title.y = element_text(hjust = 0)
+  ) +
+  scale_y_continuous(
+    labels = scales::dollar_format(scale = 1e-6, prefix = "$", suffix = "M"),
+  ) 
 ```
 ```{r}
 #|label: Use France to create a new graph, still having difficulty so I'll be sure to go to office hours
@@ -170,29 +184,34 @@ france_contributions <- pac_long %>%
 
 # Group by year, party, and sum the contributions
 summary_table_france <- france_contributions %>%
-  group_by(party, year) %>% 
-  summarize(total_contribution_france = count(france_contributions$amount))
+  group_by(year, party) %>% 
+  summarise(total_amount = sum(amount), .groups = 'drop')
 ```
 
 ``` {r Plot the data}
 
-ggplot(summary_table_france,aes(x = year, 
-                         y = total_contribution_france, 
-                         group = party,
-                         color = party)) +
-  geom_line(linewidth = 0.95) +
-  scale_color_manual(values = c(Democrat = "blue", Republican = "red")) + # Giving colors manually
-  labs(x = "Year",
-       y = "Total amount",
-       title = "Contributions to US political parties from France-connected PACs",
-       caption = "Source: OpenSecrets.org",
-       color = "Party") +
+ggplot(summary_table_france, aes(x = year, y = total_amount)) +
+  geom_line(aes(color = party), linewidth = .95) +
   theme_minimal() +
-  theme(
-    legend.position = c(0.9,0.17), # Changing legend position to replicate the required plot
-    axis.title = element_text(hjust = 0,vjust=0)
+  labs(
+    x = "Year", y = "Total amount",  linetype = NULL,
+    color = "Party",
+    title = "Contibutions to US political parties from France-connected PACs",
+    caption = "Source: OpenSecrets.org"
   ) +
-    scale_y_continuous(labels = dollar_format(scale = 1e-06, suffix = "M"))
+  scale_color_manual(
+    values = c("blue", "red"),
+    labels = c("Democrat", "Republican")
+  ) +
+  coord_cartesian(clip = "off") +
+  theme(
+    legend.position = c(0.9, 0.15),
+    axis.title.x = element_text(hjust = 0),
+    axis.title.y = element_text(hjust = 0)
+  ) +
+  scale_y_continuous(
+    labels = scales::dollar_format(scale = 1e-6, prefix = "$", suffix = "M"),
+  ) 
 ```
 
 ## 3 - Hop on
