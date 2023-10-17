@@ -257,14 +257,19 @@ Justification: The reasons for these numbers is due to the histogram and how the
 rdu_flights_planes_new |>
   glimpse()
 
+#install packages
+install.packages("ragg")
+dev = "ragg_png"
+
+install.packages("devtools")
+devtools::install_github("hadley/emo")
+
 #Recreate plot
 # Load necessary libraries
 library(ggplot2)
 library(emo)
+library(dplyr)
 
-#install packages
-install.packages("ragg")
-dev = "ragg_png"
 
 # Create the plot with emojis
 rdu_flights_planes_new|>
@@ -282,7 +287,7 @@ ggplot(aes(x=size,y=n))+
   coord_flip()+
   scale_x_discrete(limits=rev)
 
-#
+#Plot 2
 ggplot(aes(x=size,y=distance))+
   geom_segment(aes(xend=size,yend=0),color="blue",linewidth=1)+
   geom_text(aes(label ="✈️"), size = c(16,12,8,4), show.legend = FALSE)+    #flight emoji label found here:     https://symbl.cc/en/2708/
