@@ -78,6 +78,7 @@ ggplot(edibnb, aes(x = review_scores_rating, y = neighbourhood, fill = neighbour
 ```
 Joint Bandwidth = 1.22
 Interpretation: In this ridgeplot, we are able to see the Airbnb review scores in Edinburgh Neighborhood. The vertical position of the ridges on the y-axis indicates the ordering of neighborhoods by their median review scores. Neighborhoods at the top have higher median review scores, while those at the bottom have lower median review scores.The width and shape of each ridge represent the density of review scores in that neighborhood. Wider ridges indicate higher density of review scores in a particular range, while narrower ridges indicate lower density.
+
 ## 2 - Foreign Connected PACs
 
 ```{r}
@@ -213,6 +214,7 @@ ggplot(summary_table_france, aes(x = year, y = total_amount)) +
     labels = scales::dollar_format(scale = 1e-6, prefix = "$", suffix = "M"),
   ) 
 ```
+Shown above, a line plot visualizes the contributions made by France-connected PACs to US political parties over time, with a distinction between Democratic (indicated by the blue line) and Republican (indicated by the red line) contributions. The lines should show the trends and variations in contributions over the years, making it easier to understand the financial support these parties receive from such PACs. According to the line plot, France showed a massive increase in financial contributions in the year 2016 with almost $1 million in contributions, however decreased rapidly by the year 2022. However, support for the Democrat party remains in the $.4 to $.6 million dollar amount following the year 2008. 
 
 ## 3 - Hop on
 
@@ -383,6 +385,8 @@ basic_plot <- ggplot(penguins, aes(x = species, y = bill_length_mm, fill = sex))
     x = "Species",
     y = "Bill Length (mm)"
   )
+
+basic_plot <- basic_plot + theme_gray()
 
 # Display the basic plot
 print(basic_plot)
